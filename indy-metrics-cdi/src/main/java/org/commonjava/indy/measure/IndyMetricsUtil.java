@@ -10,7 +10,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
@@ -25,31 +27,35 @@ public class IndyMetricsUtil {
 
     private ScheduledReporter reporter;
 
-
     @PostConstruct
-    public void initReporter(){
-        reporter = ConsoleReporter.forRegistry(metrics).build();
+    public void initReporter() {
         logger.info("call in IndyMetricsUtil.initReporter and reporter has been start");
-        reporter.start(30, TimeUnit.SECONDS);
+        try {
+            reporter = ReporterFactory.getReporter(metrics);
+            reporter.start(30, TimeUnit.SECONDS);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @PreDestroy
-    public void destroyResource(){
+    public void destroyResource() {
         reporter.close();
     }
 
-    public Timer getTimer(IndyMetrics indyMetrics){
-        logger.info("call in IndyMetricsUtil.getTimer" );
+    public Timer getTimer(IndyMetrics indyMetrics) {
+        logger.info("call in IndyMetricsUtil.getTimer");
         return metrics.timer(name(indyMetrics.c(), indyMetrics.name()));
     }
 
-    public Meter getMeter(IndyMetrics indyMetrics){
-        logger.info("call in IndyMetricsUtil.getMeter" );
+    public Meter getMeter(IndyMetrics indyMetrics) {
+        logger.info("call in IndyMetricsUtil.getMeter");
         return metrics.meter(name(indyMetrics.c(), indyMetrics.name()));
     }
 
-    public Meter getExceptionMeter(IndyException indyException){
-        logger.info("call in IndyMetricsUtil.getExceptionMeter has exception" );
+    public Meter getExceptionMeter(IndyException indyException) {
+        logger.info("call in IndyMetricsUtil.getExceptionMeter has exception");
         return metrics.meter(name(indyException.c(), indyException.name()));
     }
 }
