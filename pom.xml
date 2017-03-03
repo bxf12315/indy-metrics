@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.commonjava</groupId>
+        <artifactId>commonjava</artifactId>
+        <version>12</version>
+    </parent>
+
     <groupId>org.commonjava.indy</groupId>
     <artifactId>indy-metrics</artifactId>
     <packaging>pom</packaging>
@@ -19,6 +25,8 @@
         <resteasy.version>3.0.9.Final</resteasy.version>
         <jaxrs.version>3.0.9</jaxrs.version>
         <cdi.version>1.2</cdi.version>
+        <javaVersion>1.8</javaVersion>
+        <enforcer.skip>true</enforcer.skip>
     </properties>
     <dependencies>
         <dependency>

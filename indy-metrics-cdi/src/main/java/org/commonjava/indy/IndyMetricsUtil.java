@@ -1,8 +1,12 @@
 package org.commonjava.indy;
 
-import com.codahale.metrics.*;
-import org.commonjava.indy.measure.annotation.IndyException;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Timer;
 import org.commonjava.indy.measure.annotation.IndyMetrics;
+import org.commonjava.indy.measure.annotation.Measure;
+import org.commonjava.indy.measure.annotation.MetricNamed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +27,7 @@ public class IndyMetricsUtil {
     private static final Logger logger = LoggerFactory.getLogger(IndyMetricsUtil.class);
 
     @Inject
-    MetricRegistry metrics;
+    MetricRegistry metricRegistry;
 
     private ScheduledReporter reporter;
 
@@ -31,7 +35,7 @@ public class IndyMetricsUtil {
     public void initReporter() {
         logger.info("call in IndyMetricsUtil.initReporter and reporter has been start");
         try {
-            reporter = ReporterFactory.getReporter(metrics);
+            reporter = ReporterFactory.getReporter( metricRegistry );
             reporter.start(30, TimeUnit.SECONDS);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -44,18 +48,32 @@ public class IndyMetricsUtil {
         reporter.close();
     }
 
-    public Timer getTimer(IndyMetrics indyMetrics) {
+    public Timer getTimer( IndyMetrics metrics, Measure measures, MetricNamed named ) {
         logger.info("call in IndyMetricsUtil.getTimer");
-        return metrics.timer(name(indyMetrics.c(), indyMetrics.name()));
+        Class<?> c = getClass( metrics, measures, named );
+        return this.metricRegistry.timer( name( c, named.name()));
     }
 
-    public Meter getMeter(IndyMetrics indyMetrics) {
+    public Meter getMeter( IndyMetrics metrics, Measure measures, MetricNamed named) {
         logger.info("call in IndyMetricsUtil.getMeter");
-        return metrics.meter(name(indyMetrics.c(), indyMetrics.name()));
+        Class<?> c = getClass( metrics, measures, named );
+        return metricRegistry.meter( name( c, named.name()));
     }
 
-    public Meter getExceptionMeter(IndyException indyException) {
-        logger.info("call in IndyMetricsUtil.getExceptionMeter has exception");
-        return metrics.meter(name(indyException.c(), indyException.name()));
+    private Class<?> getClass( IndyMetrics metrics, Measure measures, MetricNamed named )
+    {
+        Class<?> c = named.c();
+        if ( Void.class.equals( c ) )
+        {
+            c = measures.c();
+        }
+
+        if ( Void.class.equals( c ) )
+        {
+            c = metrics.c();
+        }
+
+        return c;
     }
+
 }

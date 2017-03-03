@@ -1,9 +1,14 @@
-import org.commonjava.indy.measure.annotation.IndyException;
 import org.commonjava.indy.measure.annotation.IndyMetrics;
+import org.commonjava.indy.measure.annotation.Measure;
+import org.commonjava.indy.measure.annotation.MetricNamed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Random;
@@ -19,8 +24,11 @@ public class IndyResource {
 
     @GET
     @Path("/timer/{isException :[a-zA-Z]+}")
-    @IndyMetrics(type = IndyMetrics.MetricsType.TIMER,c=IndyResource.class,name="testTimerRequest")
-    @IndyException(type = IndyException.IndyExceptionType.METERHANDLER,c=IndyResource.class,name="testTimerRequest has exception")
+    @IndyMetrics(
+            c=IndyResource.class,
+            measure = @Measure( timers = @MetricNamed( name="testTimerRequest" )),
+            exceptions = @Measure( meters= @MetricNamed( name="testTimerRequestException" ))
+    )
     public Response getTimer(@PathParam("isException") String isException) throws Exception{
         if(isException.equals("true")){
             throw new Exception("getTimer has a exception");
@@ -33,8 +41,11 @@ public class IndyResource {
 
     @GET
     @Path("/meter/{isException :[a-zA-Z]+}")
-    @IndyMetrics(type = IndyMetrics.MetricsType.METER,c=IndyResource.class,name="testMeterRequest")
-    @IndyException(type = IndyException.IndyExceptionType.METERHANDLER,c=IndyResource.class,name="testMeterRequest has exception")
+    @IndyMetrics(
+            c=IndyResource.class,
+            measure = @Measure( meters = @MetricNamed( name="testMeterRequest" )),
+            exceptions = @Measure( meters= @MetricNamed( name="testMeterRequestException" ))
+    )
     public Response getMeter(@PathParam("isException") String isException) throws Exception{
         logger.info("call in method : getMeter");
         if(isException.equals("true")){

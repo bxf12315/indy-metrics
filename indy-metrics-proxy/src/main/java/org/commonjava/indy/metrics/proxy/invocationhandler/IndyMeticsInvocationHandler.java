@@ -1,19 +1,24 @@
 package org.commonjava.indy.metrics.proxy.invocationhandler;
 
 import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
-import org.commonjava.indy.measure.annotation.IndyException;
+import com.codahale.metrics.Timer;
 import org.commonjava.indy.measure.annotation.IndyMetrics;
-import org.commonjava.indy.metrics.proxy.invocationhandler.impl.ExceptionHandler;
-import org.commonjava.indy.metrics.proxy.invocationhandler.impl.MeterHandler;
-import org.commonjava.indy.metrics.proxy.invocationhandler.impl.TimerHandler;
+import org.commonjava.indy.measure.annotation.Measure;
+import org.commonjava.indy.measure.annotation.MetricNamed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * Created by xiabai on 3/1/17.
@@ -45,30 +50,66 @@ public class IndyMeticsInvocationHandler<T> implements InvocationHandler{
         reporter.start(1, TimeUnit.SECONDS);
 
     }
-    public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+    public Object invoke(Object o, Method method, Object[] parameters) throws Throwable {
 
         Object object = null;
+        IndyMetrics metrics = method.getAnnotation( IndyMetrics.class );
+        List<Timer.Context> timers = null;
+        if (metrics instanceof IndyMetrics )
+        {
+            Measure measures = metrics.measure();
+            timers = Stream.of( measures.timers() )
+                                               .map( named -> getTimer( metrics, measures, named ).time() )
+                                               .collect( Collectors.toList() );
+        }
+
         try {
-            if (method.getAnnotation(IndyMetrics.class) instanceof IndyMetrics) {
-                IndyMetrics indyMetrics = (IndyMetrics) method.getAnnotation(IndyMetrics.class);
-                if (indyMetrics.type().equals(IndyMetrics.MetricsType.TIMER)) {
-                    TimerHandler handler = new TimerHandler();
-                    object = handler.operation(metricRegistry, proxyInstance, method, objects, method.getAnnotation(IndyMetrics.class));
-                }
-                if( indyMetrics.type().equals(IndyMetrics.MetricsType.TIMER)) {
-                    MeterHandler handler = new MeterHandler();
-                    object = handler.operation(metricRegistry, proxyInstance, method, objects, method.getAnnotation(IndyMetrics.class));
-                }
-            }
+            return method.invoke(proxyInstance,parameters);
         }
         catch(Throwable throwable) {
-            if (method.getAnnotation(IndyException.class) instanceof IndyException) {
-                ExceptionHandler handler = new ExceptionHandler();
-                handler.operation(metricRegistry,method.getAnnotation(IndyException.class));
+            if ( metrics instanceof IndyMetrics )
+            {
+                Measure exceptions = metrics.exceptions();
+                Stream.of( exceptions.meters() ).forEach( named->getMeter( metrics, exceptions, named ).mark() );
             }
 
             throw throwable;
         }
-        return object;
+        finally
+        {
+            if ( metrics instanceof IndyMetrics )
+            {
+                Measure measures = metrics.measure();
+                Stream.of( measures.meters() ).forEach( named->getMeter( metrics, measures, named ).mark() );
+            }
+        }
+    }
+
+    public Timer getTimer( IndyMetrics metrics, Measure measures, MetricNamed named ) {
+        logger.info("call in IndyMetricsUtil.getTimer");
+        Class<?> c = getClass( metrics, measures, named );
+        return this.metricRegistry.timer( name( c, named.name()));
+    }
+
+    public Meter getMeter( IndyMetrics metrics, Measure measures, MetricNamed named) {
+        logger.info("call in IndyMetricsUtil.getMeter");
+        Class<?> c = getClass( metrics, measures, named );
+        return metricRegistry.meter( name( c, named.name()));
+    }
+
+    private Class<?> getClass( IndyMetrics metrics, Measure measures, MetricNamed named )
+    {
+        Class<?> c = named.c();
+        if ( Void.class.equals( c ) )
+        {
+            c = measures.c();
+        }
+
+        if ( Void.class.equals( c ) )
+        {
+            c = metrics.c();
+        }
+
+        return c;
     }
 }

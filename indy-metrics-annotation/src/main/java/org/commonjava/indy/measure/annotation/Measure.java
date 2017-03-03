@@ -12,15 +12,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Created by xiabai on 3/2/17.
  */
-@InterceptorBinding
 @Target({METHOD, TYPE})
 @Retention(RUNTIME)
-public @interface IndyMetrics
+public @interface Measure
 {
 
     @Nonbinding
     Class c() default Void.class;
 
-    Measure measure() default @Measure();
-    Measure exceptions() default @Measure();
+    MetricNamed[] meters() default {};
+    MetricNamed[] timers() default {};
+    MetricNamed[] guages() default {};
+    MetricNamed[] counters() default {};
+    MetricNamed[] hisograms() default {};
 }
