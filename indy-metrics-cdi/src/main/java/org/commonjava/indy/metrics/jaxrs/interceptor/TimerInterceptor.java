@@ -1,7 +1,7 @@
 package org.commonjava.indy.metrics.jaxrs.interceptor;
 
 import com.codahale.metrics.Timer;
-import org.commonjava.indy.measure.IndyMetricsUtil;
+import org.commonjava.indy.IndyMetricsUtil;
 import org.commonjava.indy.measure.annotation.IndyMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.commonjava.indy.measure;
+package org.commonjava.indy;
 
 import com.codahale.metrics.*;
 import org.commonjava.indy.measure.annotation.IndyException;

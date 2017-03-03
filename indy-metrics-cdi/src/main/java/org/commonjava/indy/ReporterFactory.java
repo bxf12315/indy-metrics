@@ -1,4 +1,4 @@
-package org.commonjava.indy.measure;
+package org.commonjava.indy;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricFilter;
