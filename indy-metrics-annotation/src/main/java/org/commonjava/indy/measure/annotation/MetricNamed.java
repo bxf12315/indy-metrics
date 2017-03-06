@@ -12,21 +12,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Created by xiabai on 3/2/17.
  */
-@InterceptorBinding
 @Target({METHOD, TYPE})
 @Retention(RUNTIME)
-public @interface IndyException {
-    public enum IndyExceptionType {
-        METERHANDLER,
-        WEAPPER
-    }
-
+public @interface MetricNamed
+{
     @Nonbinding
-    Class c() default Object.class;
+    Class c() default Void.class;
 
-    @Nonbinding
-    String name() default "indy";
-
-
-    IndyException.IndyExceptionType type() default IndyException.IndyExceptionType.METERHANDLER;
+    String name();
 }
