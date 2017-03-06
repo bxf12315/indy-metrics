@@ -29,12 +29,13 @@
         <enforcer.skip>true</enforcer.skip>
     </properties>
     <dependencies>
-        <dependency>
+
+       <!-- <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>

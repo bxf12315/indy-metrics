@@ -77,6 +77,10 @@ public class IndyMeticsInvocationHandler<T> implements InvocationHandler{
         }
         finally
         {
+            if( timers !=null)
+            {
+                timers.forEach( Timer.Context::stop );
+            }
             if ( metrics instanceof IndyMetrics )
             {
                 Measure measures = metrics.measure();
