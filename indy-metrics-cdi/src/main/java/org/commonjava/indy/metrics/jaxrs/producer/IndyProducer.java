@@ -12,8 +12,8 @@ public class IndyProducer {
 
     @ApplicationScoped
     @Produces
-    public MetricRegistry getMetricRegistry(){
-        return  new MetricRegistry();
+    public MetricRegistry getMetricRegistry() {
+        return new MetricRegistry();
     }
 
 }

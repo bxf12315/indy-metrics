@@ -19,6 +19,7 @@
         <module>indy-metrics-annotation</module>
         <module>indy-metrics-proxy</module>
         <module>indy-metrics-web</module>
+        <module>indy-metrics-healthcheck</module>
     </modules>
     <properties>
         <metrics.version>3.1.0</metrics.version>
@@ -39,6 +40,18 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-healthchecks</artifactId>
             <version>${metrics.version}</version>
         </dependency>
 

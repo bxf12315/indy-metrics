@@ -1,18 +1,21 @@
 package org.commonjava.indy;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
+import com.codahale.metrics.health.HealthCheck;
 import org.commonjava.indy.measure.annotation.IndyMetrics;
 import org.commonjava.indy.measure.annotation.Measure;
 import org.commonjava.indy.measure.annotation.MetricNamed;
+import org.commonjava.indy.metrics.healthcheck.IndyHealthCheckRegistrySet;
+import org.commonjava.indy.metrics.healthcheck.IndyHealthCheck;
+import org.commonjava.indy.metrics.jvm.IndyJVMInstrumentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -24,20 +27,32 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 @ApplicationScoped
 public class IndyMetricsUtil {
+
     private static final Logger logger = LoggerFactory.getLogger(IndyMetricsUtil.class);
 
     @Inject
     MetricRegistry metricRegistry;
 
+    @Inject
+    @Any
+    Instance<IndyHealthCheck> indyMetricsHealthChecks;
+
     private ScheduledReporter reporter;
 
     @PostConstruct
-    public void initReporter() {
-        logger.info("call in IndyMetricsUtil.initReporter and reporter has been start");
+    public void initMetric() {
+        IndyJVMInstrumentation.init(metricRegistry);
+        IndyHealthCheckRegistrySet healthCheckRegistrySet = new IndyHealthCheckRegistrySet();
+
+        indyMetricsHealthChecks.forEach(indyHealthCheck -> {
+            healthCheckRegistrySet.register(indyHealthCheck.getName(),(HealthCheck) indyHealthCheck);
+        });
         try {
-            reporter = ReporterFactory.getReporter( metricRegistry );
-            reporter.start(30, TimeUnit.SECONDS);
-        } catch (IOException e) {
+            metricRegistry.register("healthCheck", healthCheckRegistrySet);
+            ConsoleReporter.forRegistry(metricRegistry).build().start(10, TimeUnit.SECONDS);
+            logger.info("call in IndyMetricsUtil.initReporter and reporter has been start");
+             ReporterIntializer.initReporter(metricRegistry);
+        } catch (Exception e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
@@ -48,28 +63,25 @@ public class IndyMetricsUtil {
         reporter.close();
     }
 
-    public Timer getTimer( IndyMetrics metrics, Measure measures, MetricNamed named ) {
+    public Timer getTimer(IndyMetrics metrics, Measure measures, MetricNamed named) {
         logger.info("call in IndyMetricsUtil.getTimer");
-        Class<?> c = getClass( metrics, measures, named );
-        return this.metricRegistry.timer( name( c, named.name()));
+        Class<?> c = getClass(metrics, measures, named);
+        return this.metricRegistry.timer(name(c, named.name()));
     }
 
-    public Meter getMeter( IndyMetrics metrics, Measure measures, MetricNamed named) {
+    public Meter getMeter(IndyMetrics metrics, Measure measures, MetricNamed named) {
         logger.info("call in IndyMetricsUtil.getMeter");
-        Class<?> c = getClass( metrics, measures, named );
-        return metricRegistry.meter( name( c, named.name()));
+        Class<?> c = getClass(metrics, measures, named);
+        return metricRegistry.meter(name(c, named.name()));
     }
 
-    private Class<?> getClass( IndyMetrics metrics, Measure measures, MetricNamed named )
-    {
+    private Class<?> getClass(IndyMetrics metrics, Measure measures, MetricNamed named) {
         Class<?> c = named.c();
-        if ( Void.class.equals( c ) )
-        {
+        if (Void.class.equals(c)) {
             c = measures.c();
         }
 
-        if ( Void.class.equals( c ) )
-        {
+        if (Void.class.equals(c)) {
             c = metrics.c();
         }
 
