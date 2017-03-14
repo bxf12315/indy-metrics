@@ -13,6 +13,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="indy-metrics-annotation" />
     <orderEntry type="module" module-name="indy-metrics-healthcheck" />
+    <orderEntry type="module" module-name="indy-metrics-common" />
     <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-core:3.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-jvm:3.1.0" level="project" />

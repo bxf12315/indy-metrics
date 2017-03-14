@@ -20,6 +20,7 @@
         <module>indy-metrics-proxy</module>
         <module>indy-metrics-web</module>
         <module>indy-metrics-healthcheck</module>
+        <module>indy-metrics-common</module>
     </modules>
     <properties>
         <metrics.version>3.1.0</metrics.version>

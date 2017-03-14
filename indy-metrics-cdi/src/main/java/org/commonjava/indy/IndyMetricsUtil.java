@@ -8,6 +8,7 @@ import org.commonjava.indy.measure.annotation.MetricNamed;
 import org.commonjava.indy.metrics.healthcheck.IndyHealthCheckRegistrySet;
 import org.commonjava.indy.metrics.healthcheck.IndyHealthCheck;
 import org.commonjava.indy.metrics.jvm.IndyJVMInstrumentation;
+import org.commonjava.indy.metrics.reporter.ReporterIntializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
