@@ -10,12 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>indy-metrics-annotation</artifactId>
-<dependencies>
-    <dependency>
-        <groupId>javax.enterprise</groupId>
-        <artifactId>cdi-api</artifactId>
-        <scope>provided</scope>
-    </dependency>
-</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>

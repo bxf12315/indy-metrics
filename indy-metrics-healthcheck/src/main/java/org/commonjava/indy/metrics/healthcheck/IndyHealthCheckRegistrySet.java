@@ -17,6 +17,8 @@ import java.util.SortedMap;
  */
 public class IndyHealthCheckRegistrySet implements MetricSet {
     private static final Logger logger = LoggerFactory.getLogger(IndyHealthCheckRegistrySet.class);
+    private String name = "healthcheck";
+
     private HealthCheckRegistry healthCheckRegistry;
 
     public IndyHealthCheckRegistrySet() {
@@ -41,5 +43,14 @@ public class IndyHealthCheckRegistrySet implements MetricSet {
 
     public void register(String name, HealthCheck healthCheck) {
         healthCheckRegistry.register(name, healthCheck);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+
     }
 }

@@ -37,30 +37,23 @@ public class IndyMetricsUtil {
     @Any
     Instance<IndyHealthCheck> indyMetricsHealthChecks;
 
-    private ScheduledReporter reporter;
-
     @PostConstruct
     public void initMetric() {
         IndyJVMInstrumentation.init(metricRegistry);
         IndyHealthCheckRegistrySet healthCheckRegistrySet = new IndyHealthCheckRegistrySet();
 
         indyMetricsHealthChecks.forEach(indyHealthCheck -> {
-            healthCheckRegistrySet.register(indyHealthCheck.getName(),(HealthCheck) indyHealthCheck);
+            healthCheckRegistrySet.register(indyHealthCheck.getName(), (HealthCheck) indyHealthCheck);
         });
         try {
-            metricRegistry.register("healthCheck", healthCheckRegistrySet);
+            metricRegistry.register(healthCheckRegistrySet.getName(), healthCheckRegistrySet);
             ConsoleReporter.forRegistry(metricRegistry).build().start(10, TimeUnit.SECONDS);
             logger.info("call in IndyMetricsUtil.initReporter and reporter has been start");
-             ReporterIntializer.initReporter(metricRegistry);
+            ReporterIntializer.initReporter(metricRegistry);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    @PreDestroy
-    public void destroyResource() {
-        reporter.close();
     }
 
     public Timer getTimer(IndyMetrics metrics, Measure measures, MetricNamed named) {
