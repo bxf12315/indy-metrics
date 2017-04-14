@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by xiabai on 4/11/17.
@@ -73,6 +75,10 @@ public class IndyZabbixSender
     private PoolingHttpClientConnectionManager connManager;
 
     private RequestConfig requestConfig;
+
+    private static final String regEx = "^-?[0-9]+$";
+
+    private static final Pattern pat = Pattern.compile( regEx );
 
     public static IndyZabbixSender.Builder create()
     {
@@ -379,7 +385,7 @@ public class IndyZabbixSender
         return host + ":" + item;
     }
 
-    void checkItem( String host, String item )
+    void checkItem( String host, String item, int vauleType )
     {
         logger.info( "checkItem( String host, String item ==" + hostName );
         try
@@ -393,7 +399,7 @@ public class IndyZabbixSender
                 logger.info( " this.getItem();" + hostName );
                 if ( result.isEmpty() )
                 {
-                    String itemId = createItem( host, item );
+                    String itemId = createItem( host, item, vauleType );
                     logger.info( " result.isEmpty() )" + hostName );
                     itemCache.put( itemCacheKey( host, item ), itemId );
                 }
@@ -414,11 +420,11 @@ public class IndyZabbixSender
         }
     }
 
-    private String createItem( String host, String item )
+    private String createItem( String host, String item, int vauleType )
     {
         // create item
         int type = 2; // trapper
-        int value_type = 0; // float
+        int value_type = vauleType; // float
         int delay = 30;
         Request request = RequestBuilder.newBuilder()
                                         .method( "item.create" )
@@ -488,8 +494,14 @@ public class IndyZabbixSender
             for ( DataObject object : dataObjectList )
             {
                 String key = object.getKey();
+                int vauleType = 0;
+                Matcher mat = pat.matcher( object.getValue() );
+                if ( !mat.find() )
+                {
+                    vauleType = 4;
+                }
                 logger.info( "SenderResult send( key " + key );
-                checkItem( hostName, key );
+                checkItem( hostName, key, vauleType );
                 logger.info( "hostName hostName ==" + hostName );
             }
         }
@@ -533,7 +545,7 @@ public class IndyZabbixSender
 
     private void zabbixApiInit()
     {
-        if ( bCreateNotExistZabbixSender )
+        if ( !bCreateNotExistZabbixSender )
         {
             return;
         }

@@ -139,10 +139,7 @@ public class ReporterIntializer
         {
 
             String url = "https://zabbix.host.stage.eng.rdu2.redhat.com/zabbix/api_jsonrpc.php";/**/
-            ZabbixApi zabbixApi = new DefaultZabbixApi( url );
-                        zabbixApi.init();
-            IndyZabbixSender zabbixSender = IndyZabbixSender.create()
-                                                            .zabbixApi( zabbixApi )
+            final IndyZabbixSender zabbixSender = IndyZabbixSender.create()
                                                             .zabbixHost( host )
                                                             .zabbixPort( String.valueOf( port ) )
                                                             .zabbixHostUrl( url )
@@ -152,19 +149,8 @@ public class ReporterIntializer
 //                                                            .bCreateNotExistHostGroup( false )
                                                             .hostName( "dhcp-136-35.nay.redhat.com" )
                                                             .ip( "10.66.137.35" )
-                                                            .bCreateNotExistZabbixSender( false )
+                                                            .bCreateNotExistZabbixSender( true )
                                                             .build();
-            String apiVersion = zabbixApi.apiVersion();
-            System.err.println( "apiVersion:" + apiVersion );
-////
-////            logger.info( "call in r zabbixApi.login =" + login );
-////            IndyZabbixSender sender = new IndyZabbixSender();
-////            sender.setHostGroup( "nos" ); org.commonjava.indy.metrics.zabbix.sender
-////            sender.setZabbixSender( zabbixSender );
-////            sender.setZabbixApi( zabbixApi );
-////            sender.setHostName( "dhcp-137-35.nay.redhat.com" );
-////            sender.setbCreateNotExistHostGroup( false );
-//
             final IndyZabbixReporter reporter = IndyZabbixReporter.forRegistry( metrics )
                                                                   .prefix( properties.getProperty(
                                                                                   INDY_METRICS_REPORTER_GRPHITEREPORTER_PREFIX ) )
@@ -175,8 +161,7 @@ public class ReporterIntializer
                                                                   .build( zabbixSender );
             logger.info( "call in report IndyZabbixReporter build" );
 
-            reporter.start( Integer.parseInt(
-                            properties.getProperty( INDY_METRICS_REPORTER_GRPHITEREPORTER_HEALTHCHECK_PERIOD ) ),
+            reporter.start( 10,
                             TimeUnit.SECONDS );
         }
         catch ( Throwable throwable )
