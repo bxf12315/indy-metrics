@@ -66,6 +66,7 @@
          <module name="org.apache.commons.configuration" />
          <module name="org.apache.cxf" />-->
          <module name="org.apache.httpcomponents" />
+		 <module name="org.apache.commons.codec" />
          <!--<module name="org.jboss.ejb-client" />
          <module name="javax.jms.api" />
          <module name="org.jboss.logging" />
