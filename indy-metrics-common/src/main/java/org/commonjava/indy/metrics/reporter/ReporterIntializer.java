@@ -151,6 +151,7 @@ public class ReporterIntializer
                                                             .bCreateNotExistHost( false )
                                                             .bCreateNotExistHostGroup( false )
                                                             .bCreateNotExistZabbixSender( false )
+                                                            .hostName( "dhcp-136-35.nay.redhat.com" )
                                                             .build();
 //            String apiVersion = zabbixApi.apiVersion();
 //            System.err.println( "apiVersion:" + apiVersion );
@@ -169,6 +170,7 @@ public class ReporterIntializer
                                                                                   INDY_METRICS_REPORTER_GRPHITEREPORTER_PREFIX ) )
                                                                   .convertRatesTo( TimeUnit.SECONDS )
                                                                   .convertDurationsTo( TimeUnit.MILLISECONDS )
+                                                                  .hostName( "dhcp-136-35.nay.redhat.com" )
                                                                   .filter( MetricFilter.ALL )
                                                                   .build( zabbixSender );
             logger.info( "call in report IndyZabbixReporter build" );

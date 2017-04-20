@@ -87,9 +87,22 @@ public class ZabbixSender
             senderRequest.setData(dataObjectList);
             senderRequest.setClock(clock);
 
+            String sendData = senderRequest.buildJSonString();
+            int length = sendData.getBytes("UTF-8").length;
+            outputStream.write(new byte[] {
+                            'Z', 'B', 'X', 'D',
+                            '\1',
+                            (byte)(length & 0xFF),
+                            (byte)((length >> 8) & 0x00FF),
+                            (byte)((length >> 16) & 0x0000FF),
+                            (byte)((length >> 24) & 0x000000FF),
+                            '\0','\0','\0','\0'});
+
+            outputStream.write(sendData.getBytes("UTF-8"));
             logger.info( "SenderResult send( dataObjectList = "+dataObjectList.toString() );
 
-            outputStream.write(senderRequest.toBytes());
+//            outputStream.write(senderRequest.toBytes());
+            logger.info( "SenderResult send( senderRequest.toBytes() = "+senderRequest.toBytes() );
 
             outputStream.flush();
 

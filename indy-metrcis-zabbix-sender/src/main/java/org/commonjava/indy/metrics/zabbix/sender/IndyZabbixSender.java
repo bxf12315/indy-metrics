@@ -115,6 +115,12 @@ public class IndyZabbixSender
             return this;
         }
 
+        public Builder hostName(String hostName)
+        {
+            this.hostName = hostName;
+            return this;
+        }
+
         public Builder zabbixPort(String zabbixPort)
         {
             this.zabbixPort = zabbixPort;
