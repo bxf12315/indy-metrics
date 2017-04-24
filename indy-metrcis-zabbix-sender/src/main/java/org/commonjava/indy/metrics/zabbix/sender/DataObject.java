@@ -108,5 +108,13 @@ public class DataObject {
 			throw new RuntimeException( e );
 		}
 	}
-
+	public static void main(String[] args)
+	{
+		DataObject d = new DataObject();
+		d.setClock( 10 );
+		d.setHost( "a" );
+		d.setKey( "b" );
+		d.setValue("100" );
+		System.out.println( d.toString() );
+	}
 }

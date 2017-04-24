@@ -64,9 +64,9 @@ public class ReporterIntializer
             String reporter = properties.getProperty( INDY_METRICS_REPORTER );
             if ( INDY_METRICS_REPORTER_GRPHITEREPORTER.equals( reporter ) )
             {
-                initGraphiteReporterForSimpleMetric( metrics, properties );
-                initGraphiteReporterForJVMMetric( metrics, properties );
-                initGraphiteReporterForHealthCheckMetric( metrics, properties );
+//                initGraphiteReporterForSimpleMetric( metrics, properties );
+//                initGraphiteReporterForJVMMetric( metrics, properties );
+//                initGraphiteReporterForHealthCheckMetric( metrics, properties );
             }
         }
 
@@ -152,6 +152,7 @@ public class ReporterIntializer
                                                             .bCreateNotExistHostGroup( false )
                                                             .bCreateNotExistZabbixSender( false )
                                                             .hostName( "dhcp-136-35.nay.redhat.com" )
+                                                            .ip( "10.66.137.35" )
                                                             .build();
 //            String apiVersion = zabbixApi.apiVersion();
 //            System.err.println( "apiVersion:" + apiVersion );

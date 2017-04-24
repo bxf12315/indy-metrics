@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -88,6 +89,10 @@ public class ZabbixSender
             senderRequest.setClock(clock);
 
             String sendData = senderRequest.buildJSonString();
+
+            logger.info( "SenderResult send( senderRequest.buildJSonString() = "+sendData );
+
+
             int length = sendData.getBytes("UTF-8").length;
             outputStream.write(new byte[] {
                             'Z', 'B', 'X', 'D',
@@ -150,7 +155,7 @@ public class ZabbixSender
                 socket.close();
             }
             if (inputStream != null) {
-                inputStream.close();
+                    inputStream.close();
             }
             if (outputStream != null) {
                 outputStream.close();
@@ -190,5 +195,34 @@ public class ZabbixSender
 
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
+    }
+
+    public static void main(String[] args) throws IOException
+    {
+        SenderRequest sr = new SenderRequest();
+        sr.setClock( 1 );
+
+        DataObject d = new DataObject();
+//        d.setClock( 10 );
+        d.setHost( "dhcp-136-35.nay.redhat.com" );
+        d.setKey( "local.one.jvm.threads.runnable.count" );
+        d.setValue( "100" );
+
+        DataObject d1 = new DataObject();
+        //        d.setClock( 10 );
+        d1.setHost( "dhcp-136-35.nay.redhat.com" );
+        d1.setKey( "local.one.jvm.threads.runnable.count" );
+        d1.setValue( "100" );
+
+
+        List<DataObject> data = new ArrayList<DataObject>();
+        data.add( d );
+        data.add( d1 );
+        sr.setData( data );
+//        sr.setRequest( "reqeust" );
+        int port = 10051;
+        String host = "10.8.64.39";
+        ZabbixSender zs= new ZabbixSender( host,port );
+        zs.send( data );
     }
 }
