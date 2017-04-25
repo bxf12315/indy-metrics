@@ -358,7 +358,8 @@ public class IndyZabbixSender
         interface1.put( "useip", 1 );
         interface1.put( "ip", ip );
         interface1.put( "dns", "" );
-        interface1.put( "port", "10051" );
+        interface1.put( "port", "10050" );
+        interface1.put( "dns",host );
 
         Request request = RequestBuilder.newBuilder()
                                         .method( "host.create" )
@@ -500,9 +501,9 @@ public class IndyZabbixSender
                 {
                     vauleType = 4;
                 }
-                logger.info( "SenderResult send( key " + key );
+//                logger.info( "SenderResult send( key " + key );
                 checkItem( hostName, key, vauleType );
-                logger.info( "hostName hostName ==" + hostName );
+//                logger.info( "hostName hostName ==" + hostName );
             }
         }
 
@@ -510,6 +511,7 @@ public class IndyZabbixSender
         {
             logger.info( "SenderResult send(" + dataObjectList.toString() );
             SenderResult senderResult = zabbixSender.send( dataObjectList, clock );
+            logger.info( "send data to zabbix server  senderResult:" + senderResult );
             if ( !senderResult.success() )
             {
                 logger.error( "send data to zabbix server error! senderResult:" + senderResult );

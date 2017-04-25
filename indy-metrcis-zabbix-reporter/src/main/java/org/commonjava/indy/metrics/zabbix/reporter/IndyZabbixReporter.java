@@ -296,8 +296,8 @@ public class IndyZabbixReporter
             if ( !senderResult.success() )
             {
                 logger.warn( "report metrics to zabbix not success!" + senderResult );
-            }
-            else if ( logger.isDebugEnabled() )
+            }else
+//            else if ( logger.isDebugEnabled() )
             {
                 logger.info( "report metrics to zabbix success. " + senderResult );
             }
