@@ -133,7 +133,7 @@ public class IndyZabbixReporter
 
         public Builder prefix( String prefix )
         {
-            this.prefix = prefix;
+            this.prefix = prefix+".";
             return this;
         }
 

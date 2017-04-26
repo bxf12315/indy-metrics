@@ -152,7 +152,7 @@ public class ReporterIntializer
                                                             .bCreateNotExistHostGroup( false )
                                                             .bCreateNotExistZabbixSender( false )
                                                             .hostName( "dhcp-136-35.nay.redhat.com" )
-                                                            .ip( "10.66.137.35" )
+//                                                            .ip( "10.66.137.35" )
                                                             .build();
 //            String apiVersion = zabbixApi.apiVersion();
 //            System.err.println( "apiVersion:" + apiVersion );
