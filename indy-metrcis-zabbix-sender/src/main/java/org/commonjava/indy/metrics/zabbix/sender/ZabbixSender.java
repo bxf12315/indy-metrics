@@ -178,32 +178,4 @@ public class ZabbixSender
         this.socketTimeout = socketTimeout;
     }
 
-    public static void main(String[] args) throws IOException
-    {
-        SenderRequest sr = new SenderRequest();
-        sr.setClock( 1 );
-
-        DataObject d = new DataObject();
-//        d.setClock( 10 );
-        d.setHost( "dhcp-136-35.nay.redhat.com" );
-        d.setKey( "local.one.jvm.threads.runnable.count" );
-        d.setValue( "100" );
-
-        DataObject d1 = new DataObject();
-        //        d.setClock( 10 );
-        d1.setHost( "dhcp-136-35.nay.redhat.com" );
-        d1.setKey( "local.one.jvm.threads.runnable.count" );
-        d1.setValue( "100" );
-
-
-        List<DataObject> data = new ArrayList<DataObject>();
-        data.add( d );
-        data.add( d1 );
-        sr.setData( data );
-//        sr.setRequest( "reqeust" );
-        int port = 10051;
-        String host = "10.8.64.39";
-        ZabbixSender zs= new ZabbixSender( host,port );
-        zs.send( data );
-    }
 }

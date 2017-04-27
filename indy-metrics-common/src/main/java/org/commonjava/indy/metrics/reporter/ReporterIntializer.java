@@ -8,12 +8,13 @@ import com.codahale.metrics.graphite.GraphiteReporter;
 import org.commonjava.indy.metrics.filter.HealthCheckMetricFilter;
 import org.commonjava.indy.metrics.filter.JVMMetricFilter;
 import org.commonjava.indy.metrics.filter.SimpleMetricFilter;
-import org.commonjava.indy.metrics.zabbix.sender.IndyZabbixApi;
-import org.commonjava.indy.metrics.zabbix.sender.ZabbixApi;
+import org.commonjava.indy.metrics.zabbix.api.IndyZabbixApi;
+import org.commonjava.indy.metrics.zabbix.api.ZabbixApi;
+import org.commonjava.indy.metrics.zabbix.reporter.IndyZabbixReporter;
 import org.commonjava.indy.metrics.zabbix.sender.IndyZabbixSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.commonjava.indy.metrics.zabbix.sender.IndyZabbixReporter;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetSocketAddress;
@@ -143,6 +144,8 @@ public class ReporterIntializer
             //            zabbixApi.init();
             IndyZabbixSender zabbixSender = IndyZabbixSender.create()
                                                             .zabbixApi( zabbixApi )
+
+
                                                             .zabbixHost( host )
                                                             .zabbixPort( String.valueOf( port ) )
                                                             .zabbixHostUrl( url )
@@ -151,20 +154,7 @@ public class ReporterIntializer
                                                             .bCreateNotExistHost( false )
                                                             .bCreateNotExistHostGroup( false )
                                                             .bCreateNotExistZabbixSender( false )
-                                                            .hostName( "dhcp-136-35.nay.redhat.com" )
-//                                                            .ip( "10.66.137.35" )
-                                                            .build();
-//            String apiVersion = zabbixApi.apiVersion();
-//            System.err.println( "apiVersion:" + apiVersion );
-//
-//            boolean login = zabbixApi.login( "xiabai", "Mimashibxf@321" );
-//            logger.info( "call in r zabbixApi.login =" + login );
-//            IndyZabbixSender sender = new IndyZabbixSender();
-//            sender.setHostGroup( "nos" ); org.commonjava.indy.metrics.zabbix.sender
-//            sender.setZabbixSender( zabbixSender );
-//            sender.setZabbixApi( zabbixApi );
-//            sender.setHostName( "dhcp-137-35.nay.redhat.com" );
-//            sender.setbCreateNotExistHostGroup( false );
+                                                            .hostName( "dhcp-136-35.nay.redhat.com" ).build();
 
             final IndyZabbixReporter reporter = IndyZabbixReporter.forRegistry( metrics )
                                                                   .prefix( properties.getProperty(

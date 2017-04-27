@@ -1,4 +1,4 @@
-package org.commonjava.indy.metrics.zabbix.sender;
+package org.commonjava.indy.metrics.zabbix.api;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

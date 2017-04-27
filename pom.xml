@@ -21,9 +21,9 @@
         <module>indy-metrics-web</module>
         <module>indy-metrics-healthcheck</module>
         <module>indy-metrics-common</module>
-        <module>indy-metircs-reporter</module>
         <module>indy-metrcis-zabbix-sender</module>
         <module>indy-metrcis-zabbix-reporter</module>
+        <module>indy-metrics-zabbix-api</module>
     </modules>
     <properties>
         <metrics.version>3.1.0</metrics.version>

@@ -1,4 +1,4 @@
-package org.commonjava.indy.metrics.zabbix.sender;
+package org.commonjava.indy.metrics.zabbix.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,15 +11,17 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by xiabai on 3/31/17.
@@ -118,25 +120,77 @@ public class IndyZabbixApi
 
     public boolean hostExists( String name )
     {
-        Request request = RequestBuilder.newBuilder().method( "host.exists" ).paramEntry( "name", name ).build();
+        Request request = RequestBuilder.newBuilder().method( "host.exists" ).paramEntry( "host", name ).build();
         JsonNode response = call( request );
         return response.get( "result" ).asBoolean();
     }
 
-    public String hostCreate( String host, String groupId )
+    /**
+     *
+     * @param name
+     * @return hostid
+     */
+    public String getHost( String name )
     {
+        ObjectMapper mapper = new ObjectMapper(  );
+        ObjectNode jsonNode = mapper.createObjectNode();
+        ArrayNode arrayNode = mapper.createArrayNode();
+        arrayNode.add( name );
+        jsonNode.put( "host", arrayNode);
+        Request request = RequestBuilder.newBuilder().method( "host.get" ).paramEntry( "filter", jsonNode ).build();
+        JsonNode response = call( request );
+        if (response.get( "result" ).isNull() || response.get( "result" ).get( 0 ) ==null)
+        {
+            return null;
+        }
+        return response.get( "result" ).get( 0 ).get( "hostid" ).asText();
+    }
+
+    /**
+     *
+     * @param host
+     * @param groupId
+     * @param ip
+     * @return hostid
+     */
+    public String hostCreate( String host, String groupId, String ip )
+    {
+        // host not exists, create it.
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode group = mapper.createObjectNode();
         ArrayNode groups = mapper.createArrayNode();
+        ObjectNode group = mapper.createObjectNode();
         group.put( "groupid", groupId );
         groups.add( group );
+
+        // "interfaces": [
+        // {
+        // "type": 1,
+        // "main": 1,
+        // "useip": 1,
+        // "ip": "192.168.3.1",
+        // "dns": "",
+        // "port": "10050"
+        // }
+        // ],
+
+        ObjectNode interface1 = mapper.createObjectNode();
+        //        JSONObject interface1 = new JSONObject();
+        interface1.put( "type", 1 );
+        interface1.put( "main", 1 );
+        interface1.put( "useip", 1 );
+        interface1.put( "ip", ip );
+        interface1.put( "dns", "" );
+        interface1.put( "port", "10050" );
+
         Request request = RequestBuilder.newBuilder()
                                         .method( "host.create" )
                                         .paramEntry( "host", host )
                                         .paramEntry( "groups", groups )
+                                        .paramEntry( "interfaces", new Object[] { interface1 } )
                                         .build();
         JsonNode response = call( request );
-        return response.get( "result" ).findValues( "hostids" ).get( 0 ).asText();
+        logger.info( "call IndyZabbixSender checkHost  zabbixApi.call( request )" + response );
+        return response.get( "result" ).get( "hostids" ).get( 0 ).asText();
     }
 
     public boolean hostgroupExists( String name )
@@ -144,6 +198,27 @@ public class IndyZabbixApi
         Request request = RequestBuilder.newBuilder().method( "hostgroup.exists" ).paramEntry( "name", name ).build();
         JsonNode response = call( request );
         return response.get( "result" ).asBoolean();
+    }
+
+    /**
+     *
+     * @param name
+     * @return groupId
+     */
+    public String getHostgroup( String name )
+    {
+        ObjectMapper mapper = new ObjectMapper(  );
+        ObjectNode jsonNode = mapper.createObjectNode();
+        ArrayNode arrayNode = mapper.createArrayNode();
+        arrayNode.add( name );
+        jsonNode.put( "name", arrayNode);
+        Request request = RequestBuilder.newBuilder().method( "hostgroup.get" ).paramEntry( "filter", jsonNode ).build();
+        JsonNode response = call( request );
+        if (response.get( "result" ).isNull() || response.get( "result" ).get( 0 ) ==null)
+        {
+            return null;
+        }
+        return response.get( "result" ).get( 0 ).get( "groupid" ).asText();
     }
 
     /**
@@ -188,17 +263,17 @@ public class IndyZabbixApi
         }
     }
 
-    public String createItem( String host, String item ,Map<String, String> hostCache)
+    public String createItem( String host, String item, String hostid ,int valueType)
     {
         // create item
         int type = 2; // trapper
-        int value_type = 0; // float
+        int value_type = valueType; // float
         int delay = 30;
         Request request = RequestBuilder.newBuilder()
                                         .method( "item.create" )
                                         .paramEntry( "name", item )
                                         .paramEntry( "key_", item )
-                                        .paramEntry( "hostid", hostCache.get( host ) )
+                                        .paramEntry( "hostid", hostid )
                                         .paramEntry( "type", type )
                                         .paramEntry( "value_type", value_type )
                                         .paramEntry( "delay", delay )
@@ -208,7 +283,7 @@ public class IndyZabbixApi
         return response.get( "result" ).findValues( "itemids" ).get( 0 ).asText();
     }
 
-    public JsonNode getItem( String host, String item , Map<String, String> hostCache)
+    public String getItem( String host, String item, String hostid )
     {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -217,10 +292,14 @@ public class IndyZabbixApi
         search.put( "key_", item );
         Request getRequest = RequestBuilder.newBuilder()
                                            .method( "item.get" )
-                                           .paramEntry( "hostids", hostCache.get( host ) )
+                                           .paramEntry( "hostids", hostid )
                                            .paramEntry( "search", search )
                                            .build();
-        JsonNode getResponse = call( getRequest );
-        return getResponse.get( "result" );
+        JsonNode response = call( getRequest );
+        if (response.get( "result" ).isNull() || response.get( "result" ).get( 0 ) ==null)
+        {
+            return null;
+        }
+        return response.get( "result" ).get( 0 ).get( "itemid" ).asText();
     }
 }

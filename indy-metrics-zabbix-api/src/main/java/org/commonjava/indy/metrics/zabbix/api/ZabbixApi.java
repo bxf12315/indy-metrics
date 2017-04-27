@@ -1,10 +1,8 @@
-package org.commonjava.indy.metrics.zabbix.sender;
+package org.commonjava.indy.metrics.zabbix.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public interface ZabbixApi
 {
@@ -21,13 +19,17 @@ public interface ZabbixApi
 
     boolean hostExists( String name );
 
-    String hostCreate( String host, String groupId );
+    String hostCreate( String host, String groupId, String ip );
 
     boolean hostgroupExists( String name );
 
     String hostgroupCreate( String name );
 
-    String createItem( String host, String item, Map<String, String> hostCache );
+    String createItem( String host, String item, String hostid, int valueType );
 
-    JsonNode getItem( String host, String item, Map<String, String> hostCache );
+    String getItem( String host, String item, String hostCache );
+
+    String getHost( String name );
+
+    String getHostgroup( String name );
 }

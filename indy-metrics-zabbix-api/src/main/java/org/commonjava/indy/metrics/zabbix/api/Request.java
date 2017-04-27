@@ -1,4 +1,4 @@
-package org.commonjava.indy.metrics.zabbix.sender;
+package org.commonjava.indy.metrics.zabbix.api;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
